@@ -1,16 +1,29 @@
+// Global variables
 const body = document.getElementsByTagName('body')[0];
 const employeesDiv = document.getElementById('employees');
 const modalOverlay = document.getElementById('modal');
 const modalDiv = document.getElementById('modal-card');
 const searchInput = document.getElementById('search');
+
+// Initialize empty string to hold all employees from API.
 let employees = [];
+// Initialize selected variable to keep track of which employee the modal
+// will display.
 let selected;
+
+// Make AJAX request to randomuser.me
 let employeeRequest = new XMLHttpRequest();
 employeeRequest.onreadystatechange = renderEmployees;
 employeeRequest.open('GET', 'https://randomuser.me/api/?results=12&nat=us');
 employeeRequest.send();
+
+// Add event listener so that if anywhere is clicked outside the modalDiv,
+// hideModal() is invoked.
 modalOverlay.addEventListener('click', hideModal);
 
+// Callback function when AJAX reqest is complete:
+  // Calls createEmloyeeCard for each employee returned from requests.
+  // createEmployeeCard returns an element which is appended to the DOM.
 function renderEmployees(){
   if(employeeRequest.readyState === 4){
     let response = JSON.parse(employeeRequest.responseText);
@@ -23,13 +36,21 @@ function renderEmployees(){
   }
 }
 
+// Add keyup event listener to to text input.
 searchInput.addEventListener('keyup', filterEmployees);
 
+// Callback function for searchInput event listener:
+  // Gets all employee DOM elements.
+  // Gets text from text input.
+  // Search criteria contains only name and email - removes city.
+  // show/hide element if employee name and email include the elements in query.
 function filterEmployees(){
   let employeeCards = document.querySelectorAll('.employee');
   let query = search.value.toLowerCase();
   for (let i = 0; i < employeeCards.length; i++){
-    if(employeeCards[i].textContent.toLowerCase().includes(query)){
+    let info = employeeCards[i].textContent;
+    let searchCriteria = info.slice(0, (info.indexOf('.com') + 3));
+    if(searchCriteria.toLowerCase().includes(query)){
       employeeCards[i].style.display = 'block';
     } else {
       employeeCards[i].style.display = 'none';
@@ -37,6 +58,8 @@ function filterEmployees(){
   }
 }
 
+// renderEmployees calls this function to create the employee elements and
+// appends to the DOM.
 function createEmployeeCard(employee){
   let card = document.createElement('div');
   card.classList.add('employee');
@@ -58,15 +81,24 @@ function createEmployeeCard(employee){
   info.appendChild(name);
   info.appendChild(email);
   info.appendChild(city);
+
+  // Add click event listener to all employee elements to call showModal()
   card.addEventListener('click', showModal);
   return card;
 }
 
+// showModal() selects the right employee from the employee array when clicked
+// and stores it in the global selected variable. createModal() constructs the
+// modal elements.
 function createModal(){
   modalDiv.innerHTML = '<p id="prev">< Prev</p><p id="next">Next ></p>';
   let prevButton = document.getElementById('prev');
   let nextButton = document.getElementById('next');
+
+  // Add click event listener to 'prev' to call prev();
   prevButton.addEventListener('click', prev);
+
+  // Add click event listener to 'next' to call next()
   nextButton.addEventListener('click', next);
   modalOverlay.style.display = 'block';
   let picture = document.createElement('div');
@@ -105,17 +137,22 @@ function createModal(){
   modalDiv.appendChild(birthdate);
 }
 
-function showModal(e){
+// Callback function for employee element click events.
+function showModal(){
   selected = employees[this.getAttribute('data-number')];
   createModal();
 }
 
+// Callback function so that if the modal is being displayed, clicking anywhere
+// except for the modalDiv will hide the modal overlay.
 function hideModal(e){
   if(e.target === modalOverlay){
     modalOverlay.style.display = 'none';
   }
 }
 
+// Callback function for 'prev' click event.
+  // Decrements currently selected employee by 1 and rerenders modal.
 function prev(){
   let current = employees.indexOf(selected);
   if(current === 0){
@@ -126,6 +163,8 @@ function prev(){
   createModal();
 }
 
+// Callback function for 'next' click event.
+  // Increments currently selected employee by 1 and rerenders modal.
 function next(){
   let current = employees.indexOf(selected);
   if(current === employees.length - 1){
