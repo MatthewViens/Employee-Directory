@@ -6,7 +6,7 @@ const modalDiv = document.getElementById('modal-card');
 const searchInput = document.getElementById('search');
 
 // Initialize empty string to hold all employees from API.
-let employees = [];
+let employeesArray = [];
 // Initialize selected variable to keep track of which employee the modal
 // will display.
 let selected;
@@ -27,9 +27,9 @@ modalOverlay.addEventListener('click', hideModal);
 function renderEmployees(){
   if(employeeRequest.readyState === 4){
     let response = JSON.parse(employeeRequest.responseText);
-    employees = response.results;
-    for(let i = 0; i < employees.length; i++){
-      let employeeCard = createEmployeeCard(employees[i]);
+    employeesArray = response.results;
+    for(let i = 0; i < employeesArray.length; i++){
+      let employeeCard = createEmployeeCard(employeesArray[i]);
       employeeCard.setAttribute('data-number', i);
       employeesDiv.appendChild(employeeCard);
     }
@@ -139,7 +139,7 @@ function createModal(){
 
 // Callback function for employee element click events.
 function showModal(){
-  selected = employees[this.getAttribute('data-number')];
+  selected = employeesArray[this.getAttribute('data-number')];
   createModal();
 }
 
@@ -154,11 +154,11 @@ function hideModal(e){
 // Callback function for 'prev' click event.
   // Decrements currently selected employee by 1 and rerenders modal.
 function prev(){
-  let current = employees.indexOf(selected);
+  let current = employeesArray.indexOf(selected);
   if(current === 0){
-    selected = employees[employees.length - 1];
+    selected = employeesArray[employees.length - 1];
   } else {
-    selected = employees[current - 1];
+    selected = employeesArray[current - 1];
   }
   createModal();
 }
@@ -166,11 +166,11 @@ function prev(){
 // Callback function for 'next' click event.
   // Increments currently selected employee by 1 and rerenders modal.
 function next(){
-  let current = employees.indexOf(selected);
-  if(current === employees.length - 1){
-    selected = employees[0];
+  let current = employeesArray.indexOf(selected);
+  if(current === employeesArray.length - 1){
+    selected = employeesArray[0];
   } else {
-    selected = employees[current + 1];
+    selected = employeesArray[current + 1];
   }
   createModal();
 }
